@@ -1,0 +1,82 @@
+https://www.youtube.com/watch?v=YjmKAPyNKfk
+
+
+USER -> NGINX -> VARNISH -> NODE
+
+upstart
+
+/opt/myapp/index.js
+
+require("http").createServer(function(req,res){
+	res.writeHead(200, { "Content-Type" : "text/html"});
+	res.end("<h1>Here runs your app...</h1>");
+}).listen(1337, "0.0.0.0");
+
+Run your app as a service
+
+sudo vi /etc/init/myapp.conf
+
+/etc/init/myapp.conf
+
+description "myapp"
+author "Ben Stuijts"
+
+start on started mountall
+stop on shutdown
+
+respawn
+respawn limit 99 5
+
+script
+	exec sudo -u myapp /usr/bin/node /opt/myapp/index.js >> /var/log/myapp.log 2>&1
+end script
+
+post-start script
+	echo "myapp was started" >> /opt/myapp/logs/myapp.log
+end script
+
+$ sudo start myapp
+bericht: "myapp start/running, process 1351"
+
+$ sudo stop myapp
+bericht: "myapp stop/wainting"
+
+-------------
+  VARNISH
+-------------
+
+Cache the requests of users. If request is already requested, varnish will response direct from memory.
+
+$ sudo vi /etc/varnish.default.vcl
+
+# more before!!! VCL configuration
+backend default {
+	.host = "127.0.0.1";
+	.port = "1337";
+}
+# rest of the file
+
+Varnish will listen to port 6081 by default -> varnish will internal redirect to port 1337 (see above).
+
+-------------
+  NGINX
+-------------
+
+$ sudo vi /etc/nginx/sites-enabled/default
+
+/etc/nginx/sites-enabled/default
+
+upstream varnish { server 127.0.0.1:6081; }
+upstream nodejs { server 127.0.0.1:1337; }
+
+server {
+	listen 80;
+	server_name _;
+
+	root /opt/myapp;
+
+	location ~* \.(jpg|css|png)$ { access_log off; }
+	location /non-cacheable-content { proxy_pass http://nodejs; }
+	location / { proxy_pass http://varnish; }
+}
+

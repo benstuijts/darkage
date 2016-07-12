@@ -1,0 +1,81 @@
+$ apt-get install nginx
+$ sudo /etc/nginx/init.d/nginx start
+
+$ htop -> bekijk worker processes
+
+set 1 worker processes per CPU
+
+$ vi /etc/nginx/nginx.conf
+
+-> worker_processes: 1;
+
+$ sudo /etc/init.d/nginx restart
+
+if you want to serve php files, you've to install:
+
+$ apt-get install php5-fpm
+
+...
+
+In nginx.conf:
+
+includes eruit halen en beginnen met configureren (binnen de {}) => laatste teken van de conf file is "}"!
+
+server {
+	
+	# https://bck.me	
+
+	listen 443;
+	ssl on;
+	ssl_certificate /etc/ssl/private/bck.me.pem;
+	ssl_certificate_key /etc/ssl/private/bck.me.key;
+
+	
+	# http://
+	
+	server {
+
+		listen 80;
+		server_name _; (default server)
+
+		# basic config for hosting 	
+	
+		location / {
+			root /test/a/;
+			index index.html;
+		}
+
+		# proxy for /shbox (example) redirect to port 4200
+	
+		location /shbpox {
+			proxy_pass http://127.0.0.1:4200;
+		}
+	}
+
+	
+	# multiple domains:
+
+	server {
+		listen 80;
+		server_name _;
+		location {
+			root /test/a/;
+			index index.html;
+		}
+	}
+
+	server {
+		listen 80;
+		server_name example.org;
+		location / {
+			root /test/b/;
+			index index.html
+		}
+	}
+
+	# multiple node servers
+		
+
+}
+
+

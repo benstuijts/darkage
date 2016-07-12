@@ -1,0 +1,42 @@
+const mongoose = require('mongoose');
+
+
+/* Connect to Database */
+mongoose.connect('localhost:27017/darkage-test');
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('Connected to MongoDB');
+});
+
+var kittySchema = mongoose.Schema({
+    name: String
+});
+
+/* Define Schema (COLLECTION = Kittens (meervoud automatisch!))*/
+var Kitten = mongoose.model('Kitten', kittySchema);
+
+var silence = new Kitten({ name: 'Silence' });
+var fluffy = new Kitten({ name: 'fluffy' });
+
+fluffy.save(function(error){
+  if(error) console.log(error);
+});
+
+/* In router function... */
+
+router.get('/addKitten/:name', function(req, res) {
+  let name = req.params.name;
+  let kitten = new Kitten({name: name});
+  kitten.save(function(error){
+    if(error) res.json(error);
+    res.send('kitten saved...<a href="/admin/kittens">See all kittens</a>');
+  });
+});
+
+router.get('/kittens', function(req, res){
+    Kitten.find({}, function(error, kittens){
+      if(error) res.json(error);
+      res.json(kittens);
+    });
+});
