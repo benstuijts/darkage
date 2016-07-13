@@ -1,6 +1,11 @@
 $ apt-get install nginx
 $ sudo /etc/nginx/init.d/nginx start
 
+of
+
+$ sudo /etc/init.d/nginx start
+
+$ apt-get install htop
 $ htop -> bekijk worker processes
 
 set 1 worker processes per CPU
@@ -22,37 +27,37 @@ In nginx.conf:
 includes eruit halen en beginnen met configureren (binnen de {}) => laatste teken van de conf file is "}"!
 
 server {
-	
-	# https://bck.me	
+
+	# https://bck.me
 
 	listen 443;
 	ssl on;
 	ssl_certificate /etc/ssl/private/bck.me.pem;
 	ssl_certificate_key /etc/ssl/private/bck.me.key;
 
-	
+
 	# http://
-	
+
 	server {
 
 		listen 80;
 		server_name _; (default server)
 
-		# basic config for hosting 	
-	
+		# basic config for hosting
+
 		location / {
 			root /test/a/;
 			index index.html;
 		}
 
 		# proxy for /shbox (example) redirect to port 4200
-	
+
 		location /shbpox {
 			proxy_pass http://127.0.0.1:4200;
 		}
 	}
 
-	
+
 	# multiple domains:
 
 	server {
@@ -74,8 +79,6 @@ server {
 	}
 
 	# multiple node servers
-		
+
 
 }
-
-

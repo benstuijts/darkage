@@ -22,3 +22,9 @@ $ git remote -v
 '''git
 $ git push origin master
 '''
+
+Iedere nieuwe commit via de Git Bash Interface!
+
+git add .
+git commit -m "some message"
+git push https://github.com/benstuijts/darkage.git

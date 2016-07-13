@@ -49,6 +49,8 @@ app.set('views', './views');
 app.set('view engine', 'ejs');
 
 /* Authentication */
+require('./authentication/config/passport')(passport);
+
 const auth = express.Router();
 //require('./authentication/app/routes/auth.js')(auth, passport);
 //app.use('/auth', auth);
